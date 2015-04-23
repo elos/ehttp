@@ -21,10 +21,12 @@ type (
 )
 
 func NewContext(rootDir string, tset *TemplateSet) *Context {
+	tm := make(TemplateMap)
+
 	return &Context{
 		rootDir: rootDir,
 		tset:    tset,
-		tmap:    new(TemplateMap),
+		tmap:    &tm,
 	}
 }
 
