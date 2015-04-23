@@ -6,6 +6,7 @@ import (
 
 	"github.com/elos/data"
 	"github.com/elos/ehttp"
+	"github.com/elos/ehttp/templates"
 	"github.com/elos/transfer"
 	"github.com/julienschmidt/httprouter"
 )
@@ -66,5 +67,12 @@ func Auth(h AccessHandle, auther transfer.Authenticator, s data.Store) httproute
 func Access(h AccessHandle, a data.Access) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		h(w, r, ps, a)
+	}
+}
+
+func Template(t TemplateHandle) AccessHandle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params, a data.Access) {
+		c := transfer.NewHTTPConnection(w, r, a)
+		templates.CatchError(c, t(c))
 	}
 }
