@@ -3,6 +3,7 @@ package ehttp
 import (
 	"net/http"
 
+	"github.com/elos/ehttp/handles"
 	"github.com/elos/transfer"
 	"github.com/julienschmidt/httprouter"
 )
@@ -44,4 +45,29 @@ func (c *Conn) Request() *http.Request {
 
 func (c *Conn) Params() *httprouter.Params {
 	return c.p
+}
+
+func (c *Conn) Val(v string) string {
+	v := c.p.ByName(v)
+
+	if v != "" {
+		return v
+	}
+
+	return c.r.FormValue(u)
+}
+
+func (c *Conn) Vals(v ...string) (map[string]string, error) {
+	params := make(map[string]string)
+
+	for _, param := range v {
+		s := c.Val(param)
+		if s == "" {
+			return nil, handles.NewMissingParamError(v)
+		}
+
+		params[v] = s
+	}
+
+	return params, nil
 }
