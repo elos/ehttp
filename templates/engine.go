@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 
@@ -21,6 +22,7 @@ type (
 		rootDir       string
 		tset          *TemplateSet
 		tmap          *TemplateMap
+		fmap          template.FuncMap
 		globalContext Context
 		everyload     bool
 	}
@@ -41,7 +43,9 @@ func (e *Engine) WithContext(c Context) *Engine {
 		rootDir:       e.rootDir,
 		tset:          e.tset,
 		tmap:          e.tmap,
+		fmap:          e.fmap,
 		globalContext: c,
+		everyload:     e.everyload,
 	}
 }
 
@@ -50,8 +54,20 @@ func (e *Engine) WithEveryLoad() *Engine {
 		rootDir:       e.rootDir,
 		tset:          e.tset,
 		tmap:          e.tmap,
+		fmap:          e.fmap,
 		globalContext: e.globalContext,
 		everyload:     true,
+	}
+}
+
+func (e *Engine) WithFuncMap(fm template.FuncMap) *Engine {
+	return &Engine{
+		rootDir:       e.rootDir,
+		tset:          e.tset,
+		tmap:          e.tmap,
+		fmap:          fm,
+		globalContext: e.globalContext,
+		everyload:     e.everyload,
 	}
 }
 
@@ -96,13 +112,24 @@ func (e *Engine) Render(connection *transfer.HTTPConnection, name Name, data int
 
 // Must be executed at least once to load templates, if the template set changes post-hoc
 // you must recall PaseHTMLTemplates() to see the changes
-func (c *Engine) ParseHTMLTemplates() error {
-	for name, set := range *c.tset {
-		t, err := template.ParseFiles(JoinDir(c.rootDir, set)...)
-		if err != nil {
+func (e *Engine) ParseHTMLTemplates() error {
+	for name, set := range *e.tset {
+		t := template.New("")
+
+		if e.fmap != nil {
+			t.Funcs(e.fmap)
+		}
+
+		if _, err := t.ParseFiles(JoinDir(e.rootDir, set)...); err != nil {
 			return err
 		}
-		(*c.tmap)[name] = t
+
+		t = t.Lookup("ROOT")
+		if t == nil {
+			return fmt.Errorf("ROOT template not found in %v", set)
+		}
+
+		(*e.tmap)[name] = t
 	}
 	return nil
 }
