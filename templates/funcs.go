@@ -40,4 +40,8 @@ var (
 	CSS = func(href string) template.HTML {
 		return template.HTML(fmt.Sprintf("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">", href))
 	}
+
+	JS = func(href string) template.HTML {
+		return template.HTML(fmt.Sprintf("<script src=\"%s\"></script>", href))
+	}
 )
