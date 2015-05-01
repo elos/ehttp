@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"text/template"
 
@@ -78,7 +79,7 @@ func (e *Engine) Show(name Name) httprouter.Handle {
 }
 
 // Handle is a httprouter.Handle that is partially curried to
-// inject the template nate and data
+// inject the template name and data
 // Note: you can only really use this if the data is constant.
 func (e *Engine) Handle(name Name, data interface{}) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -91,19 +92,22 @@ func (e *Engine) Handle(name Name, data interface{}) httprouter.Handle {
 // name, the wrapping of the data in the engine's globalContext
 func (e *Engine) Render(connection *transfer.HTTPConnection, name Name, data interface{}) error {
 	if e.everyload {
-		err := e.ParseHTMLTemplates()
+		err := e.ParseTemplates()
 		if err != nil {
 			return err
 		}
 	}
+	return e.Execute(connection.ResponseWriter(), name, data)
+}
 
+func (e *Engine) Execute(w io.Writer, name Name, data interface{}) error {
 	t, ok := (*e.tmap)[name]
 
 	if !ok {
 		return NewNotFoundError(name)
 	}
 
-	if err := t.Execute(connection.ResponseWriter(), e.globalContext.WithData(data)); err != nil {
+	if err := t.Execute(w, e.globalContext.WithData(data)); err != nil {
 		return NewRenderError(err)
 	}
 
@@ -112,7 +116,7 @@ func (e *Engine) Render(connection *transfer.HTTPConnection, name Name, data int
 
 // Must be executed at least once to load templates, if the template set changes post-hoc
 // you must recall PaseHTMLTemplates() to see the changes
-func (e *Engine) ParseHTMLTemplates() error {
+func (e *Engine) ParseTemplates() error {
 	for name, set := range *e.tset {
 		t := template.New("")
 
