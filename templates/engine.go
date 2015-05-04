@@ -3,11 +3,7 @@ package templates
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"text/template"
-
-	"github.com/elos/transfer"
-	"github.com/julienschmidt/httprouter"
 )
 
 type (
@@ -72,42 +68,26 @@ func (e *Engine) WithFuncMap(fm template.FuncMap) *Engine {
 	}
 }
 
-// Show is a shortcut for rendering templates that
-// have no specific data. Perhaps an index page.
-func (e *Engine) Show(name Name) httprouter.Handle {
-	return e.Handle(name, e.globalContext)
-}
-
-// Handle is a httprouter.Handle that is partially curried to
-// inject the template name and data
-// Note: you can only really use this if the data is constant.
-func (e *Engine) Handle(name Name, data interface{}) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		conn := transfer.NewHTTPConnection(w, r, nil)
-		CatchError(conn, e.Render(conn, name, data))
-	}
-}
-
-// Render is used by most other engine functions and actually performs the lookup of the template
-// name, the wrapping of the data in the engine's globalContext
-func (e *Engine) Render(connection *transfer.HTTPConnection, name Name, data interface{}) error {
+func (e *Engine) Execute(w io.Writer, name Name, data interface{}) error {
+	// everyload is like a development mode, always re-compile templates
 	if e.everyload {
 		err := e.ParseTemplates()
 		if err != nil {
 			return err
 		}
 	}
-	return e.Execute(connection.ResponseWriter(), name, data)
-}
 
-func (e *Engine) Execute(w io.Writer, name Name, data interface{}) error {
 	t, ok := (*e.tmap)[name]
 
 	if !ok {
 		return NewNotFoundError(name)
 	}
 
-	if err := t.Execute(w, e.globalContext.WithData(data)); err != nil {
+	if e.globalContext != nil {
+		data = e.globalContext.WithData(data)
+	}
+
+	if err := t.Execute(w, data); err != nil {
 		return NewRenderError(err)
 	}
 
@@ -115,8 +95,9 @@ func (e *Engine) Execute(w io.Writer, name Name, data interface{}) error {
 }
 
 // Must be executed at least once to load templates, if the template set changes post-hoc
-// you must recall PaseHTMLTemplates() to see the changes
-func (e *Engine) ParseTemplates() error {
+// you must Parse() again to see the changes
+// The requirement engine specifies on templates is that each set define a "ROOT" element
+func (e *Engine) Parse() error {
 	for name, set := range *e.tset {
 		t := template.New("")
 

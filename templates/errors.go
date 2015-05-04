@@ -38,7 +38,7 @@ func NewNotFoundError(n Name) *NotFoundError {
 
 // Error formats the not found error for printing/inspection
 func (n *NotFoundError) Error() string {
-	return fmt.Sprintf("templates error: could not find %s", string(*n))
+	return fmt.Sprintf("elos templates error: could not find %s", string(*n))
 }
 
 /*
@@ -52,7 +52,7 @@ func NewRenderError(err error) *RenderError {
 
 // Error formats the render error for printing/inspection
 func (r RenderError) Error() string {
-	return fmt.Sprintf("templates error: rendering failed %s", r.err)
+	return fmt.Sprintf("elos templates error: rendering failed %s", r.err)
 }
 
 // Err allows you to retrieve the original render error
@@ -71,7 +71,7 @@ func NewServerError(err error) *ServerError {
 
 // Error formats the server error for printing/inspection
 func (s ServerError) Error() string {
-	return fmt.Sprintf("templates error: server error %s", s.err)
+	return fmt.Sprintf("elos templates error: server error %s", s.err)
 }
 
 // Err allows you to retrieve the original error encountered
