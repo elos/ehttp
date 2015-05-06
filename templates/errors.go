@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/elos/transfer"
+	"github.com/elos/ehttp/serve"
 )
 
 type (
@@ -97,7 +97,7 @@ const (
 
 	CatchError will log the error as well
 */
-func CatchError(c *transfer.HTTPConnection, err error) {
+func CatchError(c serve.Conn, err error) {
 	if err == nil {
 		return
 	}

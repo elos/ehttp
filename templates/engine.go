@@ -71,7 +71,7 @@ func (e *Engine) WithFuncMap(fm template.FuncMap) *Engine {
 func (e *Engine) Execute(w io.Writer, name Name, data interface{}) error {
 	// everyload is like a development mode, always re-compile templates
 	if e.everyload {
-		err := e.ParseTemplates()
+		err := e.Parse()
 		if err != nil {
 			return err
 		}
