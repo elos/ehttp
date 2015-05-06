@@ -11,6 +11,8 @@ func Handler(route Route) http.Handler {
 }
 
 type Router interface {
+	http.Handler
+
 	DELETE(string, Route)
 	GET(string, Route)
 	HEAD(string, Route)
