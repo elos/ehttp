@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/elos/data"
+	"github.com/elos/ehttp/sock"
 	"github.com/elos/models/user"
 	"github.com/gorilla/sessions"
 )
@@ -89,7 +90,7 @@ func httpTokens(r *http.Request) []string {
 }
 
 func socketTokens(r *http.Request) []string {
-	return strings.Split(r.Header.Get(WebSocketProtocolHeader), AuthDelimeter)
+	return strings.Split(r.Header.Get(sock.WebSocketProtocolHeader), AuthDelimeter)
 }
 
 func formValues(r *http.Request) []string {
