@@ -2,6 +2,7 @@ package serve
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -102,6 +103,7 @@ func (a *Server) Start() {
 
 	<-a.Stopper
 	go a.server.Stop(a.server.Timeout)
+	log.Print("Gracefully closing all connections, shutting down server")
 	<-a.server.StopChan()
 
 	a.Life.End()
