@@ -71,9 +71,10 @@ func New(opts *Opts) *Server {
 	}
 
 	s := &graceful.Server{
-		Timeout: to,
+		Timeout:          to,
+		NoSignalHandling: true,
 		Server: &http.Server{
-			Addr:    fmt.Sprintf("%s:%s", host, port),
+			Addr:    fmt.Sprintf("%s:%d", host, port),
 			Handler: handler,
 		},
 	}
@@ -94,11 +95,13 @@ func (a *Server) Start() {
 	a.Life.Begin()
 
 	go func() {
+		// debug the error returned from ListenAndServe
+		// if Stop hangs
 		a.server.ListenAndServe()
 	}()
 
 	<-a.Stopper
-	a.server.Stop(a.server.Timeout)
+	go a.server.Stop(a.server.Timeout)
 	<-a.server.StopChan()
 
 	a.Life.End()
