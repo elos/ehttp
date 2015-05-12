@@ -10,6 +10,7 @@ type (
 	}
 
 	Sessions interface {
+		New(r *http.Request, name string) (Session, error)
 		Get(r *http.Request, name string) (Session, error)
 	}
 )
