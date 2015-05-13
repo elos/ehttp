@@ -78,3 +78,16 @@ func (c *Conn) Vals(v ...string) (map[string]string, error) {
 
 	return params, nil
 }
+
+// implements http.ResponseWriter
+func (c *Conn) Header() http.Header {
+	return c.w.Header()
+}
+
+func (c *Conn) Write(bytes []byte) (int, error) {
+	return c.w.Write(bytes)
+}
+
+func (c *Conn) WriteHeader(code int) {
+	c.WriteHeader(code)
+}
