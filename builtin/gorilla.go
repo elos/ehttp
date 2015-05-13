@@ -21,6 +21,11 @@ func (s *Sessions) Get(r *http.Request, name string) (auth.Session, error) {
 	return wrapSession(sesh), err
 }
 
+func (s *Sessions) New(r *http.Request, name string) (auth.Session, error) {
+	sesh, err := s.s.New(r, name)
+	return wrapSession(sesh), err
+}
+
 type session struct {
 	s *gorilla.Session
 }

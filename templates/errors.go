@@ -97,7 +97,7 @@ const (
 
 	CatchError will log the error as well
 */
-func CatchError(c serve.Conn, err error) {
+func CatchError(c *serve.Conn, err error) {
 	if err == nil {
 		return
 	}
