@@ -107,7 +107,7 @@ func (a *Server) Start() {
 	log.Printf("Serving on %s:%d", a.host, a.port)
 	<-a.Stopper
 	go a.server.Stop(a.server.Timeout)
-	log.Print("Gracefully closing all connections, shutting down server")
+	log.Printf("Gracefully closing all connections, shutting down server in %s", a.server.Timeout)
 	select {
 	case <-a.server.StopChan():
 		log.Print("Gracefully shutdown")
