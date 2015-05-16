@@ -29,6 +29,10 @@ var (
 		return dict, nil
 	}
 
+	Has = func(v interface{}) bool {
+		return v != nil
+	}
+
 	CharSet = func(s string) template.HTML {
 		return template.HTML(fmt.Sprintf("<meta charset=\"%s\">", s))
 	}
