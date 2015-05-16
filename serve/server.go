@@ -98,13 +98,22 @@ func (a *Server) Start() {
 	go func() {
 		// debug the error returned from ListenAndServe
 		// if Stop hangs
-		a.server.ListenAndServe()
+		err := a.server.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}()
 
+	log.Printf("Serving on %s:%d", a.host, a.port)
 	<-a.Stopper
 	go a.server.Stop(a.server.Timeout)
 	log.Print("Gracefully closing all connections, shutting down server")
-	<-a.server.StopChan()
+	select {
+	case <-a.server.StopChan():
+		log.Print("Gracefully shutdown")
+	case <-time.After(a.server.Timeout * time.Second):
+		log.Print("Failed to terminate gracefully in required timeout, exiting anyway")
+	}
 
 	a.Life.End()
 }
