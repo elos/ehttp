@@ -1,6 +1,9 @@
 package templates
 
-import "go/build"
+import (
+	"go/build"
+	"path/filepath"
+)
 
 // Name is the idiomatic mannerto refer to a TemplateSet
 type Name int
@@ -34,4 +37,16 @@ func Prepend(s string, v ...string) []string {
 		l[i+1] = v[i]
 	}
 	return l
+}
+
+// JoinDir prepends a full path to a slice of relative paths
+// i.e., base = "/root/here/", files = []string{"1.go", "2.go"}
+// JoinDir(base, files) => []string{"/root/here/1.go", "/root/here/2.go"}
+// Useful for building templateSet paths.
+func JoinDir(base string, files []string) []string {
+	r := make([]string, len(files))
+	for i := range files {
+		r[i] = filepath.Join(base, files[i])
+	}
+	return r
 }

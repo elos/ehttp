@@ -26,11 +26,8 @@ type (
 	}
 )
 
-/*
-	NewNotFoundError constructs a NotFoundError
-
-	The name should be the name of the template not found.
-*/
+// NewNotFoundError constructs a NotFoundError
+// Name should be name of template not found.
 func NewNotFoundError(n Name) *NotFoundError {
 	e := NotFoundError(n)
 	return &e
@@ -41,11 +38,8 @@ func (n *NotFoundError) Error() string {
 	return fmt.Sprintf("elos templates error: could not find %s", string(*n))
 }
 
-/*
-	NewRenderError constructs a RenderError
-
-	The err should be the direct error from rendering
-*/
+// NewRenderError constructs a RenderError
+// The err should be the direct error returned from template.Execute
 func NewRenderError(err error) *RenderError {
 	return &RenderError{err}
 }
@@ -60,11 +54,9 @@ func (r RenderError) Err() error {
 	return r.err
 }
 
-/*
-	NewServerError constructs a new ServerError
-
-	The err should be the direct error encountered
-*/
+// NewServerError constructs a new ServerError
+// The err should be the direct error encountered
+// This serves as a kind of generic error for templates
 func NewServerError(err error) *ServerError {
 	return &ServerError{err}
 }
