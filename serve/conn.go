@@ -12,16 +12,18 @@ type Params interface {
 }
 
 type Conn struct {
-	w http.ResponseWriter
-	r *http.Request
-	p Params
+	w       http.ResponseWriter
+	r       *http.Request
+	p       Params
+	context map[string]interface{}
 }
 
 func NewConn(w http.ResponseWriter, r *http.Request, p Params) *Conn {
 	return &Conn{
-		w: w,
-		r: r,
-		p: p,
+		w:       w,
+		r:       r,
+		p:       p,
+		context: make(map[string]interface{}),
 	}
 }
 
@@ -50,7 +52,7 @@ func (c *Conn) Params() Params {
 	return c.p
 }
 
-func (c *Conn) Val(v string) string {
+func (c *Conn) ParamVal(v string) string {
 	var param string
 
 	if c.p != nil {
@@ -64,11 +66,11 @@ func (c *Conn) Val(v string) string {
 	return c.r.FormValue(v)
 }
 
-func (c *Conn) Vals(v ...string) (map[string]string, error) {
+func (c *Conn) ParamVals(v ...string) (map[string]string, error) {
 	params := make(map[string]string)
 
 	for _, param := range v {
-		s := c.Val(param)
+		s := c.ParamVal(param)
 		if s == "" {
 			return nil, ehttp.NewMissingParamError(param)
 		}
@@ -77,6 +79,15 @@ func (c *Conn) Vals(v ...string) (map[string]string, error) {
 	}
 
 	return params, nil
+}
+
+func (c *Conn) AddContext(key string, val interface{}) {
+	c.context[key] = val
+}
+
+func (c *Conn) Context(key string) (interface{}, bool) {
+	v, ok := c.context[key]
+	return v, ok
 }
 
 // implements http.ResponseWriter

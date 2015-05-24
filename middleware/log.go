@@ -2,12 +2,20 @@ package middleware
 
 import (
 	"log"
-	"net/http"
+
+	"github.com/elos/ehttp/serve"
 )
 
-func LogRequest(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
-		handler.ServeHTTP(w, r)
-	})
+type logRequest string
+
+var LogRequest = logRequest("%s %s %s")
+
+func (lr logRequest) Inbound(c *serve.Conn) bool {
+	r := c.Request()
+	log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+	return true
+}
+
+func (lr logRequest) Outbound(c *serve.Conn) bool {
+	return true
 }
