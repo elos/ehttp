@@ -100,5 +100,5 @@ func (c *Conn) Write(bytes []byte) (int, error) {
 }
 
 func (c *Conn) WriteHeader(code int) {
-	c.WriteHeader(code)
+	c.w.WriteHeader(code)
 }
