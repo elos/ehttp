@@ -39,7 +39,12 @@ func (s *session) Save(r *http.Request, w http.ResponseWriter) error {
 }
 
 func (s *session) Value(key string) string {
-	return s.s.Values[key].(string)
+	val, ok := s.s.Values[key]
+	if !ok {
+		return ""
+	}
+
+	return val.(string)
 }
 
 func (s *session) SetValue(key, v string) {
