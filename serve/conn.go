@@ -102,3 +102,15 @@ func (c *Conn) Write(bytes []byte) (int, error) {
 func (c *Conn) WriteHeader(code int) {
 	c.w.WriteHeader(code)
 }
+
+// works with serve.Error and serve.Response
+
+func (c *Conn) Error(status, code uint64, msg, devmsg string) {
+	e := NewError(status, code, msg, devmsg)
+	c.WriteJSON(e)
+}
+
+func (c *Conn) Response(status uint64, data map[string]interface{}) {
+	r := NewResponse(status, data)
+	c.WriteJSON(r)
+}
