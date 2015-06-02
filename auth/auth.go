@@ -20,13 +20,13 @@ const Key = "key"
 
 var ErrMalformedCredentials = errors.New("credentials malformed")
 
-type Authenticator func(data.DB, *http.Request) (*models.User, bool, error)
+type Authenticator func(data.DB, *http.Request) (*models.User, error)
 
 var Auth = func(credentialer Credentialer) Authenticator {
-	return func(s data.DB, r *http.Request) (*models.User, bool, error) {
+	return func(s data.DB, r *http.Request) (*models.User, error) {
 		id, key, ok := credentialer(r)
 		if !ok {
-			return nil, false, ErrMalformedCredentials
+			return nil, ErrMalformedCredentials
 		}
 
 		return Authenticate(s, id, key)
