@@ -1,4 +1,4 @@
-package auth
+package serve
 
 import "net/http"
 
