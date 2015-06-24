@@ -105,12 +105,14 @@ func (c *Conn) WriteHeader(code int) {
 
 // works with serve.Error and serve.Response
 
-func (c *Conn) Error(status, code uint64, msg, devmsg string) {
+func (c *Conn) Error(status, code int, msg, devmsg string) {
 	e := NewError(status, code, msg, devmsg)
+	c.WriteHeader(status)
 	c.WriteJSON(e)
 }
 
-func (c *Conn) Response(status uint64, data map[string]interface{}) {
+func (c *Conn) Response(status int, data map[string]interface{}) {
 	r := NewResponse(status, data)
+	c.WriteHeader(status)
 	c.WriteJSON(r)
 }

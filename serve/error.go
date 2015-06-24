@@ -6,14 +6,14 @@ package serve
 // facing message, and the DevMessage is a developer friendly
 // message to help with debugging
 type Error struct {
-	Status     uint64 `json:"status"`
-	Code       uint64 `json:"code"`
+	Status     int    `json:"status"`
+	Code       int    `json:"code"`
 	Message    string `json:"message"`
 	DevMessage string `json:"developer_message"`
 }
 
 // NewError allocates and returns pointer to a new Error object
-func NewError(status, code uint64, message, devmessage string) *Error {
+func NewError(status, code int, message, devmessage string) *Error {
 	return &Error{
 		Status:     status,
 		Code:       code,
