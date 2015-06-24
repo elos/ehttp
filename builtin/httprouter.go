@@ -12,7 +12,9 @@ type Router struct {
 }
 
 func NewRouter() *Router {
-	return &Router{httprouter.New()}
+	r := httprouter.New()
+	r.RedirectTrailingSlash = false
+	return &Router{r}
 }
 
 func Handle(route serve.Route) httprouter.Handle {
