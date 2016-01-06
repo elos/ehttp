@@ -14,10 +14,10 @@ type Router struct {
 
 func NewRouter() *Router {
 	r := httprouter.New()
-	r.NotFound = func(w http.ResponseWriter, r *http.Request) {
+	r.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Print("not found")
 		http.NotFound(w, r)
-	}
+	})
 	r.RedirectTrailingSlash = false
 	return &Router{r}
 }
