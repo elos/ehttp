@@ -34,7 +34,7 @@ type (
 )
 
 var defaultOpts = &Opts{
-	Host:            "localhost",
+	Host:            "0.0.0.0",
 	Port:            8000,
 	ShutdownTimeout: 10 * time.Second,
 }
