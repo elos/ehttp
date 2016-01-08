@@ -5,9 +5,26 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 )
 
+// EnsureDirectoryExists creates a directory with permission
+// bits 0755 if that directory doesn't already exist.
+// That is: drwxr-xr-x permissions
+func EnsureDirectoryExists(path string) (err error) {
+	err = os.Mkdir(path, 0755)
+	if err != nil {
+		// If it already exists, we are fine.
+		if os.IsExist(err) {
+			err = nil
+		}
+	}
+	return
+}
+
+// ExecuteAndWriteGoFile generates a *.go file based on the template 'n', using
+// the engine 'e' and writes it to the file 'file' using the context data 'd'
 func ExecuteAndWriteGoFile(e *Engine, n Name, file string, d interface{}) error {
 	if err := ExecuteAndWrite(e, n, file, d); err != nil {
 		return err
