@@ -6,20 +6,19 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/elos/data"
-	"github.com/elos/models/user"
+	"github.com/elos/ehttp/sock"
 )
 
 func TestWebSocketDefinitions(t *testing.T) {
-	if WebSocketProtocolHeader == "" {
+	if sock.WebSocketProtocolHeader == "" {
 		t.Errorf("API must define WebSocketProtocolHeader")
 	}
 
-	if GorillaUpgrader == nil {
+	if sock.GorillaUpgrader == nil {
 		t.Errorf("API must define GorillaUpgrader")
 	}
 
-	if DefaultUpgrader == nil {
+	if sock.DefaultUpgrader == nil {
 		t.Errorf("API must define DefaultWebSocketUpgrader")
 	}
 }
@@ -28,24 +27,20 @@ func TestExtractProtocolHeader(t *testing.T) {
 	p := "askldfjasdjfkjalsdfljkasdjkfasdflkaf"
 
 	header := http.Header{}
-	header.Add(WebSocketProtocolHeader, p)
+	header.Add(sock.WebSocketProtocolHeader, p)
 
 	r := &http.Request{
 		Header: header,
 	}
 
-	var h http.Header = ExtractProtocolHeader(r)
+	var h http.Header = sock.ExtractProtocolHeader(r)
 
-	if h.Get(WebSocketProtocolHeader) != p {
+	if h.Get(sock.WebSocketProtocolHeader) != p {
 		t.Errorf("ExtractProtocolHeader failed")
 	}
 }
 
 func TestNewGorillaUpgrader(t *testing.T) {
-	client, err := user.New(data.NewNullStoreWithType("mongo"))
-	if err != nil {
-		t.Errorf("user.New returned null")
-	}
 
 	var (
 		ReadBufferSize  int  = 1024
@@ -61,19 +56,19 @@ func TestNewGorillaUpgrader(t *testing.T) {
 	r := new(http.Request)
 	r.URL = url
 
-	var u WebSocketUpgrader = NewGorillaUpgrader(ReadBufferSize, WriteBufferSize, CheckOrigin)
+	var u sock.Upgrader = sock.NewGorillaUpgrader(ReadBufferSize, WriteBufferSize, CheckOrigin)
 
 	if u == nil {
 		t.Errorf("NewGorillaUpgrader should never return nil")
 	}
 
 	// wc := httptest.NewRecorder()
-	var c SocketConnection
+	var c sock.Conn
 
 	w := httptest.NewRecorder()
 
 	// Should fail cause bad headers
-	c, err = u.Upgrade(w, r, client)
+	c, err = u.Upgrade(w, r)
 
 	if err == nil || c != nil {
 		t.Errorf("Expected Upgrade to fail because of version")
@@ -88,7 +83,7 @@ func TestNewGorillaUpgrader(t *testing.T) {
 	r.Header.Add("Upgrade", "websocket")
 	r.Header.Add("Sec-Websocket-Key", "Asfd")
 
-	c, err = u.Upgrade(w, r, client)
+	c, err = u.Upgrade(w, r)
 	if err != nil {
 		t.Errorf("GorillaUpgrader Upgrade error: %s", err)
 	}
